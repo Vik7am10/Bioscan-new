@@ -1,0 +1,11 @@
+# Large data files and directories
+  bioscan_data/
+  bin_results/
+  *model_outputs/
+  *.csv
+  *.json
+  *.pkl
+  *.h5
+  *.tar.gz
+  *.zip
+  bioscan_download.log
