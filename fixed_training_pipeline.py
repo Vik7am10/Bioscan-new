@@ -53,19 +53,19 @@ class FixedBiomassDataset(Dataset):
         self.target_scaler = target_scaler
         
         # Load image index
-        print(f"🔄 Loading image index from {image_index_json}...")
+        print(f" Loading image index from {image_index_json}...")
         with open(image_index_json, 'r') as f:
             self.image_index = json.load(f)
-        print(f"✅ Loaded index with {len(self.image_index)} images")
+        print(f" Loaded index with {len(self.image_index)} images")
         
         # Load BIN mapping data
-        print(f"🔄 Loading BIN mapping data from {bin_mapping_csv}...")
+        print(f" Loading BIN mapping data from {bin_mapping_csv}...")
         self.bin_df = pd.read_csv(bin_mapping_csv)
-        print(f"✅ Loaded {len(self.bin_df)} BIN mappings")
+        print(f" Loaded {len(self.bin_df)} BIN mappings")
         
         # Print biomass statistics
         weights = self.bin_df['mean_weight'].values
-        print(f"📊 Biomass statistics:")
+        print(f" Biomass statistics:")
         print(f"   - Mean: {weights.mean():.2f} mg")
         print(f"   - Std: {weights.std():.2f} mg")
         print(f"   - Min: {weights.min():.2f} mg")
@@ -78,7 +78,7 @@ class FixedBiomassDataset(Dataset):
         # Split data
         self.split_samples = self._split_data()
         
-        print(f"✅ Fixed dataset initialized:")
+        print(f" Fixed dataset initialized:")
         print(f"   - Total BIN mappings: {len(self.bin_df)}")
         print(f"   - Total image samples: {len(self.samples)}")
         print(f"   - {split} split samples: {len(self.split_samples)}")
@@ -87,7 +87,7 @@ class FixedBiomassDataset(Dataset):
         """Create samples using fast image index lookups."""
         samples = []
         
-        print("🔄 Creating samples with fast lookups...")
+        print(" Creating samples with fast lookups...")
         
         for _, row in self.bin_df.iterrows():
             bin_id = row['dna_bin']
@@ -117,12 +117,12 @@ class FixedBiomassDataset(Dataset):
                         }
                         samples.append(sample)
         
-        print(f"✅ Created {len(samples)} valid samples")
+        print(f" Created {len(samples)} valid samples")
         
         # Limit samples if specified
         if self.max_samples and len(samples) > self.max_samples:
             samples = random.sample(samples, self.max_samples)
-            print(f"🔄 Limited to {self.max_samples} samples")
+            print(f" Limited to {self.max_samples} samples")
         
         return samples
     
@@ -160,7 +160,7 @@ class FixedBiomassDataset(Dataset):
             return image, weight
                 
         except Exception as e:
-            print(f"❌ Error loading sample {idx}: {e}")
+            print(f" Error loading sample {idx}: {e}")
             # Return zero tensors as fallback
             image = torch.zeros(3, 224, 224)
             weight = torch.tensor(0.0, dtype=torch.float32)
@@ -201,7 +201,7 @@ def calculate_target_scaler(bin_mapping_csv: str) -> Dict:
         'std': weights.std()
     }
     
-    print(f"📊 Target scaler calculated:")
+    print(f" Target scaler calculated:")
     print(f"   - Mean: {scaler['mean']:.2f} mg")
     print(f"   - Std: {scaler['std']:.2f} mg")
     
@@ -210,10 +210,10 @@ def calculate_target_scaler(bin_mapping_csv: str) -> Dict:
 
 def train_model(config: Dict):
     """Train the improved biomass estimation model."""
-    print("🚀 Starting FIXED biomass training...")
+    print(" Starting FIXED biomass training...")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"✅ Using device: {device}")
+    print(f" Using device: {device}")
     
     # Set random seeds
     random.seed(42)
@@ -277,7 +277,7 @@ def train_model(config: Dict):
         pin_memory=True
     )
     
-    print(f"✅ Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val")
+    print(f" Created dataloaders: {len(train_dataset)} train, {len(val_dataset)} val")
     
     # Create model
     model = ImprovedBiomassEstimator(dropout_rate=0.3)
@@ -286,14 +286,14 @@ def train_model(config: Dict):
     # Count parameters
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"✅ Created model with {total_params:,} parameters ({trainable_params:,} trainable)")
+    print(f" Created model with {total_params:,} parameters ({trainable_params:,} trainable)")
     
     # Use Huber loss (more robust to outliers)
     criterion = nn.HuberLoss(delta=1.0)
     
     # Use lower learning rate with scheduler
     optimizer = optim.AdamW(model.parameters(), lr=config['learning_rate'], weight_decay=0.01)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
     # Training loop
     best_val_loss = float('inf')
@@ -304,7 +304,7 @@ def train_model(config: Dict):
     val_losses = []
     
     for epoch in range(config['num_epochs']):
-        print(f"\n🔄 Epoch {epoch+1}/{config['num_epochs']}")
+        print(f"\n Epoch {epoch+1}/{config['num_epochs']}")
         
         # Training
         model.train()
@@ -377,17 +377,17 @@ def train_model(config: Dict):
                 'epoch': epoch
             }, model_path)
             
-            print(f"  💾 Best model saved: {model_path}")
+            print(f"   Best model saved: {model_path}")
             
         else:
             patience_counter += 1
             
         if patience_counter >= patience_limit:
-            print(f"  ⏹️ Early stopping after {patience_limit} epochs without improvement")
+            print(f"   Early stopping after {patience_limit} epochs without improvement")
             break
     
-    print("✅ Training completed!")
-    print(f"💾 Best model saved to: {model_path}")
+    print(" Training completed!")
+    print(f" Best model saved to: {model_path}")
     
     return model_path
 
@@ -407,7 +407,7 @@ def main():
     parser.add_argument('--output_dir', default='fixed_model_outputs',
                        help='Output directory for model and results')
     parser.add_argument('--max_samples', type=int, default=None,
-                       help='Maximum number of samples to use (None for all)')
+                       help='Maximum number of samples to use (None for all - FULL DATASET)')
     
     args = parser.parse_args()
     
@@ -415,7 +415,7 @@ def main():
     config = vars(args)
     
     # Print configuration
-    print("🎯 Fixed Biomass Training Configuration:")
+    print(" Fixed Biomass Training Configuration:")
     print("==================================================")
     for key, value in config.items():
         print(f"{key}: {value}")
@@ -425,16 +425,16 @@ def main():
     required_files = [args.bin_mapping_csv, args.image_index_json]
     for file_path in required_files:
         if not os.path.exists(file_path):
-            print(f"❌ Required file not found: {file_path}")
+            print(f" Required file not found: {file_path}")
             sys.exit(1)
     
-    print("✅ Required files found. Starting fixed training...")
+    print(" Required files found. Starting fixed training...")
     
     # Train model
     model_path = train_model(config)
     
-    print(f"\n✅ Fixed training completed!")
-    print(f"💾 Model saved to: {model_path}")
+    print(f"\n Fixed training completed!")
+    print(f" Model saved to: {model_path}")
 
 if __name__ == "__main__":
     main()

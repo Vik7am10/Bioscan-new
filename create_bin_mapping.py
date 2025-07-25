@@ -23,56 +23,56 @@ try:
     from bioscan_dataset import BIOSCAN5M
     BIOSCAN_AVAILABLE = True
 except ImportError:
-    print("⚠️ bioscan-dataset not available, working with biomass data only")
+    print(" bioscan-dataset not available, working with biomass data only")
     BIOSCAN_AVAILABLE = False
 
 def load_biomass_data(biomass_file: str) -> pd.DataFrame:
     """Load and clean biomass data"""
-    print(f"📊 Loading biomass data from {biomass_file}")
+    print(f" Loading biomass data from {biomass_file}")
     
     try:
         df = pd.read_csv(biomass_file, sep=',')
-        print(f"✅ Loaded {len(df)} biomass records")
+        print(f" Loaded {len(df)} biomass records")
         
         # Rename columns to match expected format
         if 'index' in df.columns and 'processid' not in df.columns:
             df['processid'] = df['index']
-            print("🔧 Renamed 'index' column to 'processid'")
+            print(" Renamed 'index' column to 'processid'")
         
         if 'weight_avg' in df.columns and 'weight' not in df.columns:
             df['weight'] = df['weight_avg']
-            print("🔧 Renamed 'weight_avg' column to 'weight'")
+            print(" Renamed 'weight_avg' column to 'weight'")
         
         # Extract processid from image_file if needed
         if 'processid' not in df.columns and 'image_file' in df.columns:
             df['processid'] = df['image_file'].str.replace('.jpg', '').str.replace('.JPG', '')
-            print("🔧 Extracted processid from image_file column")
+            print(" Extracted processid from image_file column")
         
         # Check required columns
         required_cols = ['processid', 'weight']
         missing_cols = [col for col in required_cols if col not in df.columns]
         if missing_cols:
-            print(f"❌ Missing required columns: {missing_cols}")
+            print(f" Missing required columns: {missing_cols}")
             print(f"Available columns: {list(df.columns)}")
             return None
             
         # Remove rows with missing weight data
         initial_len = len(df)
         df = df.dropna(subset=['weight'])
-        print(f"🧹 Removed {initial_len - len(df)} records with missing weight data")
+        print(f" Removed {initial_len - len(df)} records with missing weight data")
         
         return df
         
     except Exception as e:
-        print(f"❌ Error loading biomass data: {e}")
+        print(f" Error loading biomass data: {e}")
         return None
 
 def load_bioscan_metadata(bioscan_root: str, download: bool = False) -> pd.DataFrame:
     """Load BIOSCAN metadata without downloading images"""
-    print(f"🔍 Loading BIOSCAN metadata from {bioscan_root}")
+    print(f" Loading BIOSCAN metadata from {bioscan_root}")
     
     if not BIOSCAN_AVAILABLE:
-        print("❌ bioscan-dataset package not available")
+        print(" bioscan-dataset package not available")
         return None
     
     try:
@@ -80,42 +80,42 @@ def load_bioscan_metadata(bioscan_root: str, download: bool = False) -> pd.DataF
         metadata_path = os.path.join(bioscan_root, "bioscan5m", "metadata", "csv", "BIOSCAN_5M_Insect_Dataset_metadata.csv")
         
         if not os.path.exists(metadata_path):
-            print(f"📥 Metadata file not found, attempting to download...")
+            print(f" Metadata file not found, attempting to download...")
             if download:
                 # Create minimal dataset just to download metadata
                 try:
                     dataset = BIOSCAN5M(root=bioscan_root, download=True, modality=())
                     # Get metadata from the dataset
                     df = dataset.metadata
-                    print(f"✅ Downloaded and loaded {len(df)} BIOSCAN records")
+                    print(f" Downloaded and loaded {len(df)} BIOSCAN records")
                 except Exception as e:
-                    print(f"⚠️  Download failed: {e}")
+                    print(f"  Download failed: {e}")
                     return None
             else:
-                print(f"❌ Metadata file not found: {metadata_path}")
-                print("💡 Run with --download flag to download metadata")
+                print(f" Metadata file not found: {metadata_path}")
+                print(" Run with --download flag to download metadata")
                 return None
         else:
             # Load existing metadata
             df = pd.read_csv(metadata_path)
-            print(f"✅ Loaded {len(df)} BIOSCAN records")
+            print(f" Loaded {len(df)} BIOSCAN records")
         
         # Check for BIN data
         if 'dna_bin' in df.columns:
             bin_count = df['dna_bin'].notna().sum()
-            print(f"🧬 Found {bin_count} records with BIN IDs")
+            print(f" Found {bin_count} records with BIN IDs")
         else:
-            print("❌ No dna_bin column found in BIOSCAN data")
+            print(" No dna_bin column found in BIOSCAN data")
             
         return df
         
     except Exception as e:
-        print(f"❌ Error loading BIOSCAN metadata: {e}")
+        print(f" Error loading BIOSCAN metadata: {e}")
         return None
 
 def create_bin_biomass_mapping(bioscan_df: pd.DataFrame, biomass_df: pd.DataFrame) -> pd.DataFrame:
     """Create mapping of BIN IDs to biomass data"""
-    print("\n🔗 Creating BIN ID to biomass mapping...")
+    print("\n Creating BIN ID to biomass mapping...")
     
     # Merge datasets on processid
     merged = pd.merge(
@@ -125,19 +125,19 @@ def create_bin_biomass_mapping(bioscan_df: pd.DataFrame, biomass_df: pd.DataFram
         how='inner'
     )
     
-    print(f"🔍 Found {len(merged)} specimens with both BIOSCAN and biomass data")
+    print(f" Found {len(merged)} specimens with both BIOSCAN and biomass data")
     
     if len(merged) == 0:
-        print("❌ No matching specimens found!")
-        print("💡 Check that processid columns match between datasets")
+        print(" No matching specimens found!")
+        print(" Check that processid columns match between datasets")
         return pd.DataFrame()
     
     # Remove records without BIN IDs
     with_bins = merged.dropna(subset=['dna_bin'])
-    print(f"🧬 {len(with_bins)} specimens have BIN IDs")
+    print(f" {len(with_bins)} specimens have BIN IDs")
     
     if len(with_bins) == 0:
-        print("❌ No specimens with BIN IDs found!")
+        print(" No specimens with BIN IDs found!")
         return pd.DataFrame()
     
     # Aggregate by BIN ID (multiple specimens per BIN)
@@ -164,14 +164,14 @@ def create_bin_biomass_mapping(bioscan_df: pd.DataFrame, biomass_df: pd.DataFram
     # Reset index to make dna_bin a column
     bin_stats = bin_stats.reset_index()
     
-    print(f"📊 Created mapping for {len(bin_stats)} unique BIN IDs")
-    print(f"📈 Average specimens per BIN: {bin_stats['specimen_count'].mean():.1f}")
+    print(f" Created mapping for {len(bin_stats)} unique BIN IDs")
+    print(f" Average specimens per BIN: {bin_stats['specimen_count'].mean():.1f}")
     
     return bin_stats
 
 def find_images_without_biomass(bioscan_df: pd.DataFrame, biomass_df: pd.DataFrame) -> pd.DataFrame:
     """Find specimens with images but no biomass data"""
-    print("\n🖼️  Finding specimens with images but no biomass...")
+    print("\n  Finding specimens with images but no biomass...")
     
     # Get processids with biomass data
     biomass_processids = set(biomass_df['processid'])
@@ -179,7 +179,7 @@ def find_images_without_biomass(bioscan_df: pd.DataFrame, biomass_df: pd.DataFra
     # Find BIOSCAN specimens without biomass
     no_biomass = bioscan_df[~bioscan_df['processid'].isin(biomass_processids)].copy()
     
-    print(f"📊 Found {len(no_biomass)} specimens with images but no biomass data")
+    print(f" Found {len(no_biomass)} specimens with images but no biomass data")
     
     # Add useful columns
     if len(no_biomass) > 0:
@@ -196,7 +196,7 @@ def find_images_without_biomass(bioscan_df: pd.DataFrame, biomass_df: pd.DataFra
 
 def find_biomass_without_images(bioscan_df: pd.DataFrame, biomass_df: pd.DataFrame) -> pd.DataFrame:
     """Find specimens with biomass but no images"""
-    print("\n⚖️  Finding specimens with biomass but no images...")
+    print("\n  Finding specimens with biomass but no images...")
     
     # Get processids with images
     bioscan_processids = set(bioscan_df['processid'])
@@ -204,7 +204,7 @@ def find_biomass_without_images(bioscan_df: pd.DataFrame, biomass_df: pd.DataFra
     # Find biomass specimens without images
     no_images = biomass_df[~biomass_df['processid'].isin(bioscan_processids)].copy()
     
-    print(f"📊 Found {len(no_images)} specimens with biomass but no images")
+    print(f" Found {len(no_images)} specimens with biomass but no images")
     
     return no_images
 
@@ -239,25 +239,25 @@ def save_results(bin_mapping: pd.DataFrame, no_biomass: pd.DataFrame,
     
     # Create output directory
     Path(output_dir).mkdir(exist_ok=True)
-    print(f"\n💾 Saving results to {output_dir}/")
+    print(f"\n Saving results to {output_dir}/")
     
     # Save BIN to biomass mapping
     if not bin_mapping.empty:
         bin_file = os.path.join(output_dir, "bin_id_biomass_mapping.csv")
         bin_mapping.to_csv(bin_file, index=False)
-        print(f"✅ Saved BIN mapping: {bin_file}")
+        print(f" Saved BIN mapping: {bin_file}")
     
     # Save specimens with images but no biomass
     if not no_biomass.empty:
         images_file = os.path.join(output_dir, "specimens_images_no_biomass.csv")
         no_biomass.to_csv(images_file, index=False)
-        print(f"✅ Saved images without biomass: {images_file}")
+        print(f" Saved images without biomass: {images_file}")
     
     # Save specimens with biomass but no images
     if not no_images.empty:
         biomass_file = os.path.join(output_dir, "specimens_biomass_no_images.csv")
         no_images.to_csv(biomass_file, index=False)
-        print(f"✅ Saved biomass without images: {biomass_file}")
+        print(f" Saved biomass without images: {biomass_file}")
     
     # Save summary statistics
     stats_file = os.path.join(output_dir, "data_summary_statistics.txt")
@@ -288,7 +288,7 @@ def save_results(bin_mapping: pd.DataFrame, no_biomass: pd.DataFrame,
             for split, count in stats['bioscan_splits'].items():
                 f.write(f"  {split}: {count:,}\n")
     
-    print(f"✅ Saved summary statistics: {stats_file}")
+    print(f" Saved summary statistics: {stats_file}")
 
 def main():
     parser = argparse.ArgumentParser(description="Create BIN ID to biomass mapping and data gap analysis")
@@ -299,7 +299,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🧬 BIN ID TO BIOMASS MAPPING ANALYSIS")
+    print(" BIN ID TO BIOMASS MAPPING ANALYSIS")
     print("="*60)
     
     # Load data
@@ -322,13 +322,13 @@ def main():
     # Save results
     save_results(bin_mapping, no_biomass, no_images, stats, args.output_dir)
     
-    print(f"\n🎯 ANALYSIS COMPLETE!")
+    print(f"\n ANALYSIS COMPLETE!")
     print("="*60)
-    print(f"📊 {stats['specimens_with_both']:,} specimens have both images and biomass")
-    print(f"🖼️  {stats['specimens_images_only']:,} specimens have images but no biomass")
-    print(f"⚖️  {stats['specimens_biomass_only']:,} specimens have biomass but no images")
-    print(f"🧬 {stats['bin_ids_with_biomass']:,} BIN IDs have biomass data")
-    print(f"\n💾 Results saved to {args.output_dir}/")
+    print(f" {stats['specimens_with_both']:,} specimens have both images and biomass")
+    print(f"  {stats['specimens_images_only']:,} specimens have images but no biomass")
+    print(f"  {stats['specimens_biomass_only']:,} specimens have biomass but no images")
+    print(f" {stats['bin_ids_with_biomass']:,} BIN IDs have biomass data")
+    print(f"\n Results saved to {args.output_dir}/")
 
 if __name__ == "__main__":
     main()

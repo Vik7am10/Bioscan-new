@@ -8,7 +8,7 @@
 #SBATCH --mem=32G
 #SBATCH --gres=gpu:4
 
-echo "🚀 Fixed Biomass Training"
+echo " Fixed Biomass Training"
 echo "=========================================="
 echo "Job ID: $SLURM_JOB_ID"
 echo "Job Name: $SLURM_JOB_NAME"
@@ -21,7 +21,7 @@ echo "=========================================="
 
 # Load modules
 module load python/3.11
-source ~/myenv311/bin/activate
+source myenv311/bin/activate
 
 # GPU info
 nvidia-smi
@@ -32,7 +32,7 @@ echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available()
 echo "GPU count: $(python -c 'import torch; print(torch.cuda.device_count())')"
 
 echo "=========================================="
-echo "🎯 Fixed Training Configuration:"
+echo " Fixed Training Configuration:"
 echo "BIN mapping CSV: bin_results/bin_id_biomass_mapping.csv"
 echo "Image index JSON: image_index.json"
 echo "Batch size: 32"
@@ -51,23 +51,23 @@ echo "=========================================="
 
 # Check required files
 if [ ! -f "bin_results/bin_id_biomass_mapping.csv" ]; then
-    echo "❌ BIN mapping CSV not found!"
+    echo " BIN mapping CSV not found!"
     exit 1
 fi
 
 if [ ! -f "image_index.json" ]; then
-    echo "❌ Image index JSON not found!"
+    echo " Image index JSON not found!"
     exit 1
 fi
 
-echo "✅ Required files found. Starting fixed training..."
+echo " Required files found. Starting fixed training..."
 
-# Install any missing packages
-echo "🔄 Installing required packages..."
-pip install torchmetrics pillow
+# Check if packages are already installed
+echo " Checking installed packages..."
+python -c "import torchmetrics, PIL; print(' Required packages already installed')" || echo "  Some packages missing - install them before submitting job"
 
 # Run fixed training
-echo "🚀 Starting FIXED biomass training..."
+echo " Starting FIXED biomass training..."
 python fixed_training_pipeline.py \
     --bin_mapping_csv bin_results/bin_id_biomass_mapping.csv \
     --image_index_json image_index.json \

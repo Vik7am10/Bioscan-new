@@ -26,18 +26,18 @@ python login_node_download.py
 
 **Expected output:**
 ```
-📥 BIOSCAN-5M Dataset Download (Login Node)
+ BIOSCAN-5M Dataset Download (Login Node)
 ==========================================
-💾 Available disk space: 25.4 GB
-🔄 Setting up environment...
-✅ bioscan-dataset package available
-📥 Downloading train split...
-🔄 Attempt 1/3 for train split...
-✅ Successfully downloaded train split!
+ Available disk space: 25.4 GB
+ Setting up environment...
+ bioscan-dataset package available
+ Downloading train split...
+ Attempt 1/3 for train split...
+ Successfully downloaded train split!
 Dataset size: 3,505,971 samples
-💾 Disk usage after train: 12.3GB
+ Disk usage after train: 12.3GB
 ...
-🎉 BIOSCAN dataset download completed successfully!
+ BIOSCAN dataset download completed successfully!
 ```
 
 ## Step 2: Process on Compute Node

@@ -14,7 +14,7 @@ def create_image_index(images_root: str, output_file: str = "image_index.json"):
     Create index of all image files in BIOSCAN directory.
     Maps processid -> image_path for fast lookups.
     """
-    print(f"🔍 Scanning images in: {images_root}")
+    print(f" Scanning images in: {images_root}")
     
     image_index = {}
     total_files = 0
@@ -23,10 +23,10 @@ def create_image_index(images_root: str, output_file: str = "image_index.json"):
     cropped_dir = Path(images_root) / "cropped_256"
     
     if not cropped_dir.exists():
-        print(f"❌ Directory not found: {cropped_dir}")
+        print(f" Directory not found: {cropped_dir}")
         return
     
-    print(f"📁 Scanning directory: {cropped_dir}")
+    print(f" Scanning directory: {cropped_dir}")
     
     start_time = time.time()
     
@@ -47,7 +47,7 @@ def create_image_index(images_root: str, output_file: str = "image_index.json"):
     
     end_time = time.time()
     
-    print(f"✅ Indexing complete!")
+    print(f" Indexing complete!")
     print(f"   - Total images: {total_files}")
     print(f"   - Time taken: {end_time - start_time:.2f} seconds")
     
@@ -55,23 +55,23 @@ def create_image_index(images_root: str, output_file: str = "image_index.json"):
     with open(output_file, 'w') as f:
         json.dump(image_index, f, indent=2)
     
-    print(f"💾 Index saved to: {output_file}")
+    print(f" Index saved to: {output_file}")
     return image_index
 
 def main():
-    images_root = "/home/vikramre/scratch/bioscan_data/bioscan5m/images"
+    images_root = "/home/vikramre/links/scratch/bioscan_data/bioscan5m/images"
     
     if not os.path.exists(images_root):
-        print(f"❌ Images directory not found: {images_root}")
+        print(f" Images directory not found: {images_root}")
         return
     
-    print("🚀 Creating BIOSCAN Image Index")
+    print(" Creating BIOSCAN Image Index")
     print("=" * 50)
     
     index = create_image_index(images_root)
     
     # Show some sample mappings
-    print("\n📋 Sample mappings:")
+    print("\n Sample mappings:")
     sample_keys = list(index.keys())[:5]
     for key in sample_keys:
         print(f"  {key} -> {index[key]}")
