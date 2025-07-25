@@ -11,7 +11,7 @@ def download_bioscan():
     print(f"📥 BIOSCAN Download Started: {datetime.now()}")
     
     # Navigate to scratch directory
-    scratch_dir = os.path.expanduser("~/scratch")
+    scratch_dir = os.path.expanduser("~/links/scratch")
     os.chdir(scratch_dir)
     
     # Create bioscan_data directory

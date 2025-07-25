@@ -59,7 +59,7 @@ def create_image_index(images_root: str, output_file: str = "image_index.json"):
     return image_index
 
 def main():
-    images_root = "/home/vikramre/scratch/bioscan_data/bioscan5m/images"
+    images_root = "/home/vikramre/links/scratch/bioscan_data/bioscan5m/images"
     
     if not os.path.exists(images_root):
         print(f"❌ Images directory not found: {images_root}")

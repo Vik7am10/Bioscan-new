@@ -21,7 +21,7 @@ echo "=========================================="
 
 # Load modules
 module load python/3.11
-source ~/myenv311/bin/activate
+source myenv311/bin/activate
 
 # GPU info
 nvidia-smi
@@ -62,9 +62,9 @@ fi
 
 echo "✅ Required files found. Starting fixed training..."
 
-# Install any missing packages
-echo "🔄 Installing required packages..."
-pip install torchmetrics pillow
+# Check if packages are already installed
+echo "🔍 Checking installed packages..."
+python -c "import torchmetrics, PIL; print('✅ Required packages already installed')" || echo "⚠️  Some packages missing - install them before submitting job"
 
 # Run fixed training
 echo "🚀 Starting FIXED biomass training..."

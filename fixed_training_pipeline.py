@@ -293,7 +293,7 @@ def train_model(config: Dict):
     
     # Use lower learning rate with scheduler
     optimizer = optim.AdamW(model.parameters(), lr=config['learning_rate'], weight_decay=0.01)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
     # Training loop
     best_val_loss = float('inf')
@@ -407,7 +407,7 @@ def main():
     parser.add_argument('--output_dir', default='fixed_model_outputs',
                        help='Output directory for model and results')
     parser.add_argument('--max_samples', type=int, default=None,
-                       help='Maximum number of samples to use (None for all)')
+                       help='Maximum number of samples to use (None for all - FULL DATASET)')
     
     args = parser.parse_args()
     

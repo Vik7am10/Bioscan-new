@@ -203,7 +203,7 @@ def main():
     
     # File paths
     biomass_file = "5m_mass_metadata_avg.csv"
-    metadata_file = "/home/vikramre/scratch/bioscan_data/bioscan5m/metadata/csv/BIOSCAN_5M_Insect_Dataset_metadata.csv"
+    metadata_file = "/home/vikramre/links/scratch/bioscan_data/bioscan5m/metadata/csv/BIOSCAN_5M_Insect_Dataset_metadata.csv"
     output_dir = "./bin_results"
     
     # Load data
