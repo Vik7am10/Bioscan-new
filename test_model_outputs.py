@@ -22,7 +22,11 @@ from fixed_training_pipeline import FixedBiomassDataset, ImprovedBiomassEstimato
 
 def load_trained_model(model_path: str, device: torch.device):
     """Load the trained model from checkpoint."""
+<<<<<<< HEAD
     print(f"🔄 Loading model from {model_path}...")
+=======
+    print(f" Loading model from {model_path}...")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Fix for PyTorch 2.6+ weights_only default change
     checkpoint = torch.load(model_path, map_location=device, weights_only=False)
@@ -34,8 +38,13 @@ def load_trained_model(model_path: str, device: torch.device):
     config = checkpoint['config']
     target_scaler = checkpoint['target_scaler']
     
+<<<<<<< HEAD
     print(f"✅ Model loaded successfully")
     print(f"📊 Target scaler: mean={target_scaler['mean']:.2f}, std={target_scaler['std']:.2f}")
+=======
+    print(f" Model loaded successfully")
+    print(f" Target scaler: mean={target_scaler['mean']:.2f}, std={target_scaler['std']:.2f}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     return model, config, target_scaler, checkpoint
 
@@ -48,10 +57,17 @@ def denormalize_predictions(predictions, target_scaler):
 def evaluate_model(model_path: str):
     """Evaluate the trained model and show predictions."""
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+<<<<<<< HEAD
     print(f"🔄 Using device: {device}")
     
     if torch.cuda.is_available():
         print(f"🚀 GPU Details:")
+=======
+    print(f" Using device: {device}")
+    
+    if torch.cuda.is_available():
+        print(f" GPU Details:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
         print(f"   GPU Count: {torch.cuda.device_count()}")
         print(f"   Current GPU: {torch.cuda.current_device()}")
         print(f"   GPU Name: {torch.cuda.get_device_name(0)}")
@@ -84,7 +100,11 @@ def evaluate_model(model_path: str):
         num_workers=2
     )
     
+<<<<<<< HEAD
     print(f"🔍 Testing on {len(test_dataset)} samples...")
+=======
+    print(f" Testing on {len(test_dataset)} samples...")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Collect predictions and targets
     all_predictions = []
@@ -106,7 +126,11 @@ def evaluate_model(model_path: str):
             all_losses.append(loss.item())
             
             if batch_idx == 0:  # Show first batch details
+<<<<<<< HEAD
                 print(f"\n📊 First batch details:")
+=======
+                print(f"\n First batch details:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
                 print(f"   Batch size: {images.shape[0]}")
                 print(f"   Input shape: {images.shape}")
                 print(f"   Output range: [{outputs.min().item():.4f}, {outputs.max().item():.4f}]")
@@ -132,7 +156,11 @@ def evaluate_model(model_path: str):
     
     avg_loss = np.mean(all_losses)
     
+<<<<<<< HEAD
     print(f"\n📈 Model Performance:")
+=======
+    print(f"\n Model Performance:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     print(f"   Average Test Loss: {avg_loss:.4f}")
     print(f"   Normalized MSE: {mse:.4f}")
     print(f"   Normalized MAE: {mae:.4f}")
@@ -142,7 +170,11 @@ def evaluate_model(model_path: str):
     print(f"   Denormalized RMSE: {rmse_denorm:.2f} mg")
     
     # Show prediction examples
+<<<<<<< HEAD
     print(f"\n🔍 Sample Predictions (denormalized):")
+=======
+    print(f"\n Sample Predictions (denormalized):")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     print(f"{'Index':<6} {'Predicted':<12} {'Actual':<12} {'Error':<12}")
     print("-" * 50)
     
@@ -154,22 +186,36 @@ def evaluate_model(model_path: str):
     pred_std = np.std(predictions)
     pred_denorm_std = np.std(pred_denorm)
     
+<<<<<<< HEAD
     print(f"\n🎯 Prediction Variability:")
+=======
+    print(f"\n Prediction Variability:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     print(f"   Normalized prediction std: {pred_std:.4f}")
     print(f"   Denormalized prediction std: {pred_denorm_std:.2f} mg")
     print(f"   Target std: {np.std(target_denorm):.2f} mg")
     
     if pred_std < 0.01:
+<<<<<<< HEAD
         print("⚠️  WARNING: Model predictions have very low variability (possible constant predictions)")
     else:
         print("✅ Model shows good prediction variability")
+=======
+        print("  WARNING: Model predictions have very low variability (possible constant predictions)")
+    else:
+        print(" Model shows good prediction variability")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Training history
     if 'train_losses' in checkpoint and 'val_losses' in checkpoint:
         train_losses = checkpoint['train_losses']
         val_losses = checkpoint['val_losses']
         
+<<<<<<< HEAD
         print(f"\n📚 Training History:")
+=======
+        print(f"\n Training History:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
         print(f"   Total epochs trained: {len(train_losses)}")
         print(f"   Final train loss: {train_losses[-1]:.4f}")
         print(f"   Final val loss: {val_losses[-1]:.4f}")
@@ -197,22 +243,38 @@ def main():
     # Find the latest model file
     model_dir = "fixed_model_outputs"
     if not os.path.exists(model_dir):
+<<<<<<< HEAD
         print(f"❌ Model directory not found: {model_dir}")
+=======
+        print(f" Model directory not found: {model_dir}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
         return
     
     model_files = list(Path(model_dir).glob("*.pth"))
     if not model_files:
+<<<<<<< HEAD
         print(f"❌ No model files found in {model_dir}")
+=======
+        print(f" No model files found in {model_dir}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
         return
     
     # Use the latest model
     latest_model = max(model_files, key=os.path.getmtime)
+<<<<<<< HEAD
     print(f"🎯 Testing latest model: {latest_model}")
+=======
+    print(f" Testing latest model: {latest_model}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Evaluate model
     results = evaluate_model(str(latest_model))
     
+<<<<<<< HEAD
     print(f"\n✅ Model evaluation completed!")
+=======
+    print(f"\n Model evaluation completed!")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 
 
 if __name__ == "__main__":

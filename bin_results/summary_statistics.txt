@@ -1,0 +1,27 @@
+DIRECT BIN MAPPING ANALYSIS SUMMARY
+==================================================
+
+Total BIOSCAN specimens: 2,895,731
+Total biomass specimens: 1,667
+Specimens with both: 26,135
+Specimens with BIN IDs: 26,135
+Unique BIN IDs: 1,408
+
+Weight statistics:
+  Mean: 6.2162
+  Std:  40.9320
+  Min:  0.0005
+  Max:  1346.5333
+  Count: 1,667
+
+Top 10 BINs by specimen count:
+  BOLD:ACR4696: 2476 specimens
+  BOLD:AAU6534: 2117 specimens
+  BOLD:AAC1744: 1102 specimens
+  BOLD:ACR4709: 602 specimens
+  BOLD:AAN5358: 593 specimens
+  BOLD:AAA1513: 505 specimens
+  BOLD:AAA3453: 487 specimens
+  BOLD:AAN8450: 364 specimens
+  BOLD:AAX9300: 348 specimens
+  BOLD:AAN8044: 300 specimens

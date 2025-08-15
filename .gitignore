@@ -1,11 +1,20 @@
-# Large data files and directories
-  bioscan_data/
-  bin_results/
-  *model_outputs/
-  *.csv
-  *.json
-  *.pkl
-  *.h5
-  *.tar.gz
-  *.zip
-  bioscan_download.log
+# Data files
+*.csv
+*.json
+image_index.json
+
+# Model outputs
+*_outputs/
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+myenv*/
+
+# Slurm outputs
+slurm-*.out
+*-*.out
+
+# Temporary files
+temp_*

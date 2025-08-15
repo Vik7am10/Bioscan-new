@@ -55,6 +55,7 @@ def calculate_metrics(predictions, targets, metric_name=""):
     }
 
 
+<<<<<<< HEAD
 def create_all_samples_fast(use_cleaned=True):
     """Create ALL samples that have biomass data (no image loading, no limits)."""
     
@@ -68,6 +69,16 @@ def create_all_samples_fast(use_cleaned=True):
     
     image_index_json = 'image_index.json'
     
+=======
+def create_all_samples_fast():
+    """Create ALL samples that have biomass data (no image loading, no limits)."""
+    
+    # Load BIN mapping data
+    bin_mapping_csv = 'bin_results/bin_id_biomass_mapping.csv'
+    image_index_json = 'image_index.json'
+    
+    print(f" Loading data...")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     df = pd.read_csv(bin_mapping_csv)
     
     with open(image_index_json, 'r') as f:
@@ -106,12 +117,17 @@ def create_all_samples_fast(use_cleaned=True):
     return all_weights, samples
 
 
+<<<<<<< HEAD
 def evaluate_baseline_fast(use_cleaned=True):
+=======
+def evaluate_baseline_fast():
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     """Fast baseline evaluation without image loading."""
     
     print(" Fast Baseline Evaluation: Mean Prediction Analysis")
     print("=" * 60)
     
+<<<<<<< HEAD
     # Use cleaned dataset by default
     if use_cleaned and os.path.exists('bin_results/bin_id_biomass_mapping_cleaned.csv'):
         bin_mapping_csv = 'bin_results/bin_id_biomass_mapping_cleaned.csv'
@@ -126,6 +142,16 @@ def evaluate_baseline_fast(use_cleaned=True):
     biomass_values = df['mean_weight'].values
     
     print(f" {dataset_type} Dataset Statistics:")
+=======
+    # Load biomass data
+    bin_mapping_csv = 'bin_results/bin_id_biomass_mapping.csv'
+    
+    print(f" Loading biomass data from {bin_mapping_csv}...")
+    df = pd.read_csv(bin_mapping_csv)
+    biomass_values = df['mean_weight'].values
+    
+    print(f" Full Dataset Statistics:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     print(f"   Total BIN groups: {len(df)}")
     print(f"   Biomass mean: {biomass_values.mean():.2f} mg")
     print(f"   Biomass std: {biomass_values.std():.2f} mg")
@@ -133,7 +159,11 @@ def evaluate_baseline_fast(use_cleaned=True):
     print(f"   Biomass range: [{biomass_values.min():.2f}, {biomass_values.max():.2f}] mg")
     
     # Get ALL samples with biomass data
+<<<<<<< HEAD
     all_weights, all_samples = create_all_samples_fast(use_cleaned)
+=======
+    all_weights, all_samples = create_all_samples_fast()
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     print(f"\n Full Evaluation Set Statistics ({len(all_weights)} samples):")
     print(f"   Mean: {all_weights.mean():.2f} mg")
@@ -215,8 +245,13 @@ def main():
     
     print(" Required files found")
     
+<<<<<<< HEAD
     # Run baseline evaluation on cleaned data
     results = evaluate_baseline_fast(use_cleaned=True)
+=======
+    # Run baseline evaluation
+    results = evaluate_baseline_fast()
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     print(f"\n Fast baseline evaluation completed!")
     print(f" Ready to train on full dataset to beat {results['baseline_mae']:.2f} mg MAE baseline")

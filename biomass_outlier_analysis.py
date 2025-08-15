@@ -85,6 +85,7 @@ def calculate_image_features(image_path):
         return None
 
 
+<<<<<<< HEAD
 def load_dataset_with_bioscan_features(max_samples=1000):
     """Load dataset using BIOSCAN5M image_measurement_value for correlation analysis."""
     
@@ -135,6 +136,53 @@ def load_dataset_with_bioscan_features(max_samples=1000):
                     })
     
     print(f" Created {len(samples)} samples with BIOSCAN measurements")
+=======
+def load_dataset_with_features(max_samples=1000):
+    """Load dataset and calculate image features for correlation analysis."""
+    
+    # Load data
+    bin_mapping_csv = 'bin_results/bin_id_biomass_mapping.csv'
+    image_index_json = 'image_index.json'
+    
+    print(f" Loading data...")
+    df = pd.read_csv(bin_mapping_csv)
+    
+    with open(image_index_json, 'r') as f:
+        image_index = json.load(f)
+    
+    # Create samples
+    samples = []
+    
+    print(f" Creating samples...")
+    for _, row in df.iterrows():
+        bin_id = row['dna_bin']
+        weight = row['mean_weight']
+        specimen_count = row['specimen_count']
+        
+        # Get BIOSCAN processids for this BIN
+        try:
+            if isinstance(row['bioscan_processids'], str):
+                bioscan_processids = eval(row['bioscan_processids'])
+            else:
+                bioscan_processids = row['bioscan_processids']
+        except:
+            bioscan_processids = []
+        
+        # Add samples for this BIN
+        for processid in bioscan_processids:
+            if processid in image_index:
+                image_path = image_index[processid]
+                if os.path.exists(image_path):
+                    samples.append({
+                        'image_path': image_path,
+                        'processid': processid,
+                        'bin_id': bin_id,
+                        'weight': weight,
+                        'specimen_count': specimen_count
+                    })
+    
+    print(f" Created {len(samples)} samples")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Limit for analysis speed
     if max_samples and len(samples) > max_samples:
@@ -144,6 +192,7 @@ def load_dataset_with_bioscan_features(max_samples=1000):
     return samples
 
 
+<<<<<<< HEAD
 def create_scaling_law_plot(df_analysis, outlier_samples):
     """Create visualization of biological scaling law with outliers highlighted."""
     
@@ -255,12 +304,15 @@ def create_scaling_law_plot(df_analysis, outlier_samples):
     print(f"   Scaling law visualization saved: scaling_law_analysis.png")
 
 
+=======
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 def analyze_biomass_correlations(max_samples=1000):
     """Analyze correlations between image features and biomass."""
     
     print(" Biomass Outlier Analysis: Image Features vs Biomass")
     print("=" * 60)
     
+<<<<<<< HEAD
     # Check if we can resume from saved data
     if os.path.exists('biomass_feature_analysis.csv'):
         print(" Found existing analysis data, loading...")
@@ -278,11 +330,26 @@ def analyze_biomass_correlations(max_samples=1000):
         for sample in tqdm(samples, desc="Processing samples"):
             # Use BIOSCAN measurements directly - no image processing needed
             pixel_area = sample['pixel_area']
+=======
+    # Load samples
+    samples = load_dataset_with_features(max_samples)
+    
+    # Calculate features for each image
+    print(f" Calculating image features for {len(samples)} samples...")
+    
+    analysis_data = []
+    failed_count = 0
+    
+    for sample in tqdm(samples, desc="Processing images"):
+        features = calculate_image_features(sample['image_path'])
+        if features:
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
             data_point = {
                 'processid': sample['processid'],
                 'bin_id': sample['bin_id'],
                 'weight': sample['weight'],
                 'specimen_count': sample['specimen_count'],
+<<<<<<< HEAD
                 'pixel_area': pixel_area,
                 'cube_area': pixel_area ** 1.5,  # Volume proxy
                 'sqrt_area': np.sqrt(pixel_area),  # Linear dimension proxy
@@ -305,6 +372,19 @@ def analyze_biomass_correlations(max_samples=1000):
     # Set threading to avoid BLAS issues
     os.environ['OMP_NUM_THREADS'] = '1'
     os.environ['OPENBLAS_NUM_THREADS'] = '1'
+=======
+                **features
+            }
+            analysis_data.append(data_point)
+        else:
+            failed_count += 1
+    
+    print(f" Successfully processed {len(analysis_data)} samples")
+    print(f" Failed to process {failed_count} samples")
+    
+    # Convert to DataFrame
+    df_analysis = pd.DataFrame(analysis_data)
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Basic statistics
     print(f"\n Dataset Statistics:")
@@ -335,12 +415,18 @@ def analyze_biomass_correlations(max_samples=1000):
     print(f"\n Correlation Analysis:")
     print("=" * 50)
     
+<<<<<<< HEAD
     feature_cols = ['pixel_area', 'cube_area', 'sqrt_area']
+=======
+    feature_cols = ['pixel_area', 'cube_area', 'sqrt_area', 'bbox_area', 
+                   'contour_area', 'aspect_ratio', 'solidity']
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     correlations = {}
     
     for feature in feature_cols:
         if feature in df_analysis.columns:
+<<<<<<< HEAD
             try:
                 # Use numpy correlation to avoid BLAS threading issues
                 r_pearson = np.corrcoef(df_analysis[feature], df_analysis['weight'])[0,1]
@@ -366,6 +452,22 @@ def analyze_biomass_correlations(max_samples=1000):
                     'spearman_r': 0.0,
                     'spearman_p': 1.0
                 }
+=======
+            # Pearson correlation
+            r_pearson, p_pearson = pearsonr(df_analysis[feature], df_analysis['weight'])
+            
+            # Spearman correlation (rank-based, more robust to outliers)
+            r_spearman, p_spearman = spearmanr(df_analysis[feature], df_analysis['weight'])
+            
+            correlations[feature] = {
+                'pearson_r': r_pearson,
+                'pearson_p': p_pearson,
+                'spearman_r': r_spearman,
+                'spearman_p': p_spearman
+            }
+            
+            print(f"{feature:<15} | Pearson: {r_pearson:>6.3f} (p={p_pearson:.3f}) | Spearman: {r_spearman:>6.3f} (p={p_spearman:.3f})")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Find best correlating features
     best_pearson = max(correlations.items(), key=lambda x: abs(x[1]['pearson_r']))
@@ -375,6 +477,7 @@ def analyze_biomass_correlations(max_samples=1000):
     print(f"   Pearson: {best_pearson[0]} (r={best_pearson[1]['pearson_r']:.3f})")
     print(f"   Spearman: {best_spearman[0]} (r={best_spearman[1]['spearman_r']:.3f})")
     
+<<<<<<< HEAD
     # BIOLOGICAL SCALING LAW OUTLIER DETECTION
     print(f"\n Biological Scaling Law Outlier Detection:")
     print("=" * 50)
@@ -471,6 +574,49 @@ def analyze_biomass_correlations(max_samples=1000):
     # Create scaling law visualization
     print(f"\n Creating scaling law visualization...")
     create_scaling_law_plot(df_analysis, outlier_samples)
+=======
+    # Outlier detection using best feature
+    best_feature = best_spearman[0]  # Use Spearman as it's more robust
+    
+    print(f"\n Outlier Detection using {best_feature}:")
+    
+    # Calculate residuals from expected relationship
+    x = df_analysis[best_feature].values
+    y = df_analysis['weight'].values
+    
+    # Fit robust regression (resistant to outliers)
+    from sklearn.linear_model import HuberRegressor
+    huber = HuberRegressor(epsilon=1.35)  # Default epsilon
+    huber.fit(x.reshape(-1, 1), y)
+    
+    y_pred = huber.predict(x.reshape(-1, 1))
+    residuals = y - y_pred
+    
+    # Identify outliers using residuals
+    residual_threshold = 3 * np.std(residuals)  # 3-sigma rule
+    outlier_mask = np.abs(residuals) > residual_threshold
+    
+    outlier_samples = df_analysis[outlier_mask]
+    
+    print(f"   Residual threshold: ±{residual_threshold:.2f} mg")
+    print(f"   Outliers detected: {len(outlier_samples)} ({len(outlier_samples)/len(df_analysis)*100:.1f}%)")
+    
+    if len(outlier_samples) > 0:
+        print(f"\n Top Outliers by Residual:")
+        outlier_samples_sorted = outlier_samples.assign(residual=residuals[outlier_mask])
+        outlier_samples_sorted = outlier_samples_sorted.sort_values('residual', key=abs, ascending=False)
+        
+        print(f"{'BIN ID':<12} {'Weight':<8} {'Feature':<10} {'Predicted':<10} {'Residual':<10}")
+        print("-" * 60)
+        
+        for _, row in outlier_samples_sorted.head(10).iterrows():
+            idx = df_analysis.index.get_loc(row.name)
+            pred_weight = y_pred[idx]
+            residual = residuals[idx]
+            feature_val = row[best_feature]
+            
+            print(f"{row['bin_id']:<12} {row['weight']:<8.1f} {feature_val:<10.0f} {pred_weight:<10.1f} {residual:<10.1f}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     # Save results
     print(f"\n Saving analysis results...")
@@ -491,7 +637,10 @@ def analyze_biomass_correlations(max_samples=1000):
     print(f"   - biomass_feature_analysis.csv (full analysis)")
     print(f"   - biomass_outliers.csv (outlier samples)")
     print(f"   - biomass_correlations.csv (correlation results)")
+<<<<<<< HEAD
     print(f"   - scaling_law_analysis.png (visualization)")
+=======
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     return df_analysis, outlier_samples, correlations
 
@@ -505,8 +654,12 @@ def main():
     np.random.seed(42)
     
     # Check required files
+<<<<<<< HEAD
     required_files = ['bin_results/bin_id_biomass_mapping.csv', 
                      os.path.expanduser('~/links/scratch/bioscan_data/bioscan5m/metadata/csv/BIOSCAN_5M_Insect_Dataset_metadata.csv')]
+=======
+    required_files = ['bin_results/bin_id_biomass_mapping.csv', 'image_index.json']
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     for file_path in required_files:
         if not os.path.exists(file_path):
             print(f" Required file not found: {file_path}")
@@ -514,8 +667,13 @@ def main():
     
     print(" Required files found")
     
+<<<<<<< HEAD
     # Run analysis on FULL dataset (all samples)
     df_analysis, outliers, correlations = analyze_biomass_correlations(max_samples=None)
+=======
+    # Run analysis (limit to 1000 samples for speed)
+    df_analysis, outliers, correlations = analyze_biomass_correlations(max_samples=1000)
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     
     print(f"\n Recommendations:")
     print(f"   1. Review samples with weight > {df_analysis['weight'].quantile(0.95):.1f} mg (95th percentile)")

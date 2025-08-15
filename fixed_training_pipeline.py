@@ -114,6 +114,7 @@ class FixedBiomassDataset(Dataset):
             self.image_index = json.load(f)
         print(f" Loaded index with {len(self.image_index)} images")
         
+<<<<<<< HEAD
         # Load BIN mapping data - use cleaned version if available and requested
         if use_cleaned and os.path.exists('bin_results/bin_id_biomass_mapping_cleaned.csv'):
             bin_mapping_path = 'bin_results/bin_id_biomass_mapping_cleaned.csv'
@@ -130,6 +131,12 @@ class FixedBiomassDataset(Dataset):
             print(f"\n🔧 Applying dataset filters...")
             self.bin_df = apply_dataset_filters(self.bin_df, self.config)
             print("")
+=======
+        # Load BIN mapping data
+        print(f" Loading BIN mapping data from {bin_mapping_csv}...")
+        self.bin_df = pd.read_csv(bin_mapping_csv)
+        print(f" Loaded {len(self.bin_df)} BIN mappings")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
         
         # Print biomass statistics
         weights = self.bin_df['mean_weight'].values
@@ -844,7 +851,7 @@ def main():
     parser.add_argument('--output_dir', default='enhanced_model_outputs',
                        help='Output directory for model and results')
     parser.add_argument('--max_samples', type=int, default=None,
-                       help='Maximum number of samples to use (None for all)')
+                       help='Maximum number of samples to use (None for all - FULL DATASET)')
     
     # New loss function argument
     parser.add_argument('--loss_function', choices=['mae', 'mse', 'mape', 'smape', 'hybrid'], 
@@ -872,7 +879,11 @@ def main():
     config = vars(args)
     
     # Print configuration
+<<<<<<< HEAD
     print(" Enhanced Biomass Training Configuration:")
+=======
+    print(" Fixed Biomass Training Configuration:")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
     print("==================================================")
     for key, value in config.items():
         print(f"{key}: {value}")
@@ -885,6 +896,7 @@ def main():
             print(f" Required file not found: {file_path}")
             sys.exit(1)
     
+<<<<<<< HEAD
     print(" Required files found.")
     
     # Choose training method
@@ -899,6 +911,15 @@ def main():
         model_path = train_model(config)
         print(f"\n✅ Single training completed!")
         print(f" Model saved to: {model_path}")
+=======
+    print(" Required files found. Starting fixed training...")
+    
+    # Train model
+    model_path = train_model(config)
+    
+    print(f"\n Fixed training completed!")
+    print(f" Model saved to: {model_path}")
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=outlier_analysis
 #SBATCH --account=def-pfieguth
+<<<<<<< HEAD
 #SBATCH --time=2:00:00
+=======
+#SBATCH --time=1:00:00
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --output=outlier_analysis-%j.out
@@ -19,10 +23,13 @@ echo "=========================================="
 # Change to submission directory
 cd $SLURM_SUBMIT_DIR
 
+<<<<<<< HEAD
 # Activate virtual environment
 echo " Activating virtual environment..."
 source myenv311/bin/activate
 
+=======
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 # Show Python info
 echo "Python version: $(python --version)"
 echo "Working directory: $(pwd)"
@@ -49,7 +56,11 @@ python -c "import cv2, sklearn, scipy, tqdm; print(' All packages available')" |
 }
 
 # Run outlier analysis
+<<<<<<< HEAD
 echo " Starting outlier analysis on ALL samples (~11,826)..."
+=======
+echo " Starting outlier analysis on 1000 samples..."
+>>>>>>> 9266c3c71f078214ff961d8a43734944ed545525
 echo "Expected features to analyze:"
 echo "  - Pixel area (foreground pixels)"
 echo "  - Cube area (area^1.5 as volume proxy)"
